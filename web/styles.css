@@ -154,7 +154,6 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
-  /* ✅ prepreči “spodnji layer” občutek */
   padding-bottom: 26px;
 }
 .bubble{
@@ -182,7 +181,6 @@ audio{
   border-radius: 14px;
 }
 
-/* Right panel (mobile: off-canvas) */
 .right{
   position: fixed;
   inset: 0 0 0 auto;
