@@ -617,7 +617,6 @@ app.post("/turn", upload.single("audio"), async (req, res) => {
       if (city) p.city = city;
       if (lvl) p.coverageLevel = lvl;
 
-      // ✅ anti-loop: če user da nekaj neveljavnega za HP, daj boljši hint
       if (p.pendingSlot === "horsepower" && p.horsepower == null) {
         const n = parseSlNumberRobust(transcript);
         if (n != null && n >= 20 && n <= 600) {
@@ -684,7 +683,6 @@ app.post("/turn", upload.single("audio"), async (req, res) => {
       return await respondWithTTS(res, transcript, replyText, { premiumResult: result });
     }
 
-    // RAG
     const hits = retrieveDocs(transcript, docs, 5);
     const context = hits.length
       ? hits.map((h) => `---\nDOC: ${h.id}\n${h.text}`).join("\n")
