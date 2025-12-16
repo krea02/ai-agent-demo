@@ -25,7 +25,6 @@
     </header>
 
     <main class="grid">
-      <!-- LEFT: chat -->
       <section class="panel">
         <div class="panelHeader">
           <div class="panelTitle">Pogovor</div>
@@ -44,7 +43,6 @@
         <audio id="player" controls></audio>
       </section>
 
-      <!-- RIGHT: docs + help -->
       <aside class="panel right" id="rightPanel">
         <div class="panelHeader">
           <div class="panelTitle">Dokumenti (RAG)</div>
@@ -54,32 +52,42 @@
           </div>
         </div>
 
-        <div class="rightBody">
-          <div class="helpCard">
-            <div class="helpTitle">Navodila</div>
-            <ol class="helpList">
-              <li>Klikni <b>Drži in govori</b> in dovoli mikrofon.</li>
-              <li>Govori in spusti gumb.</li>
-              <li>Odgovor dobiš kot tekst + audio.</li>
-            </ol>
-          </div>
+<div class="rightBody">
+  <div class="helpCard">
+    <div class="helpTitle">Navodila</div>
+    <ol class="helpList">
+      <li>Klikni <b>Drži in govori</b> in dovoli dostop do mikrofona.</li>
+      <li>Govori vprašanje in spusti gumb.</li>
+      <li>Agent vrne odgovor kot <b>tekst</b> in kot <b>audio</b>.</li>
+      <li>
+        Primeri vprašanj:
+        <ul>
+          <li>“Kako prijavim škodo?”</li>
+          <li>“Kaj pomeni delni kasko?”</li>
+          <li>“Izračunaj polni kasko za 10 let star avto z 90 KM v Ljubljani.”</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
 
-          <div class="docs">
-            <div class="docsHeader">
-              <div class="docsHint">Spodaj vidiš dokumente, ki jih agent uporablja za RAG.</div>
-            </div>
+  <div class="docs">
+    <div class="docsHeader">
+      <div class="docsHint">
+        Spodaj vidiš dokumente, ki jih agent uporablja kot vir znanja (RAG).
+      </div>
+    </div>
 
-            <div class="docsList" id="docsList"></div>
+    <div class="docsList" id="docsList"></div>
 
-            <div class="docViewer" id="docViewer">
-              <div class="docViewerHeader">
-                <div class="docTitle" id="docTitle">Izberi dokument</div>
-                <div class="docMeta" id="docMeta"></div>
-              </div>
-              <pre class="docText" id="docText"></pre>
-            </div>
-          </div>
-        </div>
+    <div class="docViewer" id="docViewer">
+      <div class="docViewerHeader">
+        <div class="docTitle" id="docTitle">Izberi dokument</div>
+        <div class="docMeta" id="docMeta"></div>
+      </div>
+      <pre class="docText" id="docText"></pre>
+    </div>
+  </div>
+</div>
       </aside>
     </main>
 

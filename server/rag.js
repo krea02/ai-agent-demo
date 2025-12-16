@@ -1,8 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-// Preprost RAG: naloži docs in vrni top-k po "keyword overlap".
-// (Embeddings dodamo v koraku 2b, če boš želel bolj “pravo” RAG)
 export function loadDocs(docsDir) {
   const files = fs.readdirSync(docsDir).filter(f => f.endsWith(".md"));
   return files.map((f) => {
