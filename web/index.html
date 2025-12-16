@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Voice Agent</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🎙️</div>
+        <div>
+          <div class="title">AI Voice Agent</div>
+          <div class="subtitle">Govorni asistent (turn-based)</div>
+        </div>
+      </div>
+
+      <div class="topmeta">
+        <span class="pill" id="healthPill">Backend: …</span>
+        <span class="pill pill-muted" id="sessionPill">Session: …</span>
+        <button class="iconBtn" id="toggleRight" aria-label="Odpri dokumente">☰</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- LEFT: chat -->
+      <section class="panel">
+        <div class="panelHeader">
+          <div class="panelTitle">Pogovor</div>
+          <div class="panelActions">
+            <button class="btn btn-ghost" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="callCard">
+          <button class="btn btn-primary" id="talkBtn">🎤 Drži in govori</button>
+          <span class="status" id="status">Pripravljen</span>
+        </div>
+
+        <div class="chat" id="log" aria-live="polite"></div>
+
+        <audio id="player" controls></audio>
+      </section>
+
+      <!-- RIGHT: docs + help -->
+      <aside class="panel right" id="rightPanel">
+        <div class="panelHeader">
+          <div class="panelTitle">Dokumenti (RAG)</div>
+          <div class="panelActions">
+            <button class="btn btn-ghost" id="refreshDocsBtn">Osveži</button>
+            <button class="iconBtn closeRight" id="closeRight" aria-label="Zapri">✕</button>
+          </div>
+        </div>
+
+        <div class="rightBody">
+          <div class="helpCard">
+            <div class="helpTitle">Navodila</div>
+            <ol class="helpList">
+              <li>Klikni <b>Drži in govori</b> in dovoli mikrofon.</li>
+              <li>Govori in spusti gumb.</li>
+              <li>Odgovor dobiš kot tekst + audio.</li>
+            </ol>
+          </div>
+
+          <div class="docs">
+            <div class="docsHeader">
+              <div class="docsHint">Spodaj vidiš dokumente, ki jih agent uporablja za RAG.</div>
+            </div>
+
+            <div class="docsList" id="docsList"></div>
+
+            <div class="docViewer" id="docViewer">
+              <div class="docViewerHeader">
+                <div class="docTitle" id="docTitle">Izberi dokument</div>
+                <div class="docMeta" id="docMeta"></div>
+              </div>
+              <pre class="docText" id="docText"></pre>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <div class="backdrop" id="backdrop"></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
