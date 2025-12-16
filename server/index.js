@@ -16,11 +16,16 @@ dotenv.config({ path: path.join(__dirname, "..", ".env") });
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
-app.use("/", express.static(path.join(__dirname, "..", "web")));
+const webDir = path.join(__dirname, "..", "web");
+
+app.use(express.static(webDir));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(webDir, "index.html"));
+});
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// sessionId -> { messages: [...], state: {...} }
 const sessions = new Map();
 
 function getSession(sessionId) {
@@ -45,7 +50,6 @@ function getSession(sessionId) {
   return sessions.get(sessionId);
 }
 
-// ---- RAG docs ----
 const docsDir = path.join(__dirname, "..", "docs");
 
 let docs = [];
@@ -58,7 +62,6 @@ try {
 }
 
 
-// -------- OpenAI helpers (STT, LLM, TTS) --------
 
 async function sttTranscribe(audioBuffer, filename) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -148,13 +151,11 @@ async function respondWithTTS(res, transcript, replyText, extra = {}) {
   });
 }
 
-// -------- Number parsing (robust SL for voice) --------
 
 function cleanTextForNumber(s) {
   return (s || "")
     .toLowerCase()
     .normalize("NFKC")
-    // STT weirdness
     .replace(/\bzdeset\b/gu, "deset")
     .replace(/[^\p{L}\p{M}\d\s]/gu, " ")
     .replace(/\s+/g, " ")
@@ -165,13 +166,11 @@ function normalizeWord(w) {
   return (w || "").toLowerCase().trim();
 }
 
-// tiny fuzzy helper: treat "deve" as "devet", etc.
 function isWordLike(word, target) {
   const w = normalizeWord(word);
   const t = normalizeWord(target);
   if (w === t) return true;
   if (w.startsWith(t.slice(0, 3)) && w.length >= 3) return true; // "deve" ~ "devet"
-  // light common STT swap
   const w2 = w.replace(/u/g, "v");
   const t2 = t.replace(/u/g, "v");
   if (w2 === t2) return true;
@@ -181,14 +180,12 @@ function isWordLike(word, target) {
 function parseSlNumberRobust(text) {
   const t = cleanTextForNumber(text);
 
-  // 1) digits
   const digit = t.match(/\b(\d{1,4})\b/);
   if (digit) return Number(digit[1]);
 
   const words = t.split(" ").filter(Boolean);
   if (!words.length) return null;
 
-  // 2) "dve pet pet" => 255 (sequence)
   const digitWords = {
     "nič": "0", "nula": "0",
     "ena": "1", "en": "1", "eno": "1",
@@ -272,14 +269,12 @@ function parseSlNumberRobust(text) {
 
     for (const [k, v] of Object.entries(tens)) {
       if (s.includes(k)) {
-        // petinpetdeset, dveinosemdeset, ...
         for (const [oneK, oneV] of Object.entries(ones)) {
           const compact = s.replace(/\s+/g, "");
           const pattern = `${oneK}in${k}`;
           if (compact.includes(pattern)) return v + oneV;
         }
 
-        // "petdeset pet" ali "petdeset in pet"
         const m = s.match(new RegExp(`\\b${k}\\b(?:\\s+in\\s+|\\s+)?([\\p{L}\\p{M}]+)\\b`, "iu"));
         if (m) {
           const w = m[1].toLowerCase();
@@ -292,7 +287,6 @@ function parseSlNumberRobust(text) {
 
     for (const [k, v] of Object.entries(teens)) if (s.includes(k)) return v;
 
-    // special: "devet deset" => 90
     const ws = s.split(" ").filter(Boolean);
     for (let i = 0; i < ws.length - 1; i++) {
       const a = ws[i];
@@ -311,7 +305,6 @@ function parseSlNumberRobust(text) {
     return null;
   }
 
-  // hundreds
   const joined = words.join(" ");
   for (const [hWord, hVal] of Object.entries(hundreds)) {
     if (joined.includes(hWord)) {
@@ -326,7 +319,6 @@ function parseSlNumberRobust(text) {
   return parseBelow100(words);
 }
 
-// -------- Premium parsing --------
 
 function extractVehicleAge(text) {
   const t = cleanTextForNumber(text);
@@ -390,7 +382,6 @@ function extractCity(text) {
     t.includes("nima veze")
   ) return "Other";
 
-  // avoid misreading numbers as city
   const maybeNum = parseSlNumberRobust(t);
   if (maybeNum != null) return null;
 
@@ -435,7 +426,7 @@ function missingSlot(p) {
 
 function questionForSlot(slot) {
   if (slot === "vehicleAge") return "Koliko je star avto (v letih)?";
-  if (slot === "horsepower") return "Koliko ima avto konjskih moči (KM)? (npr. 90 ali 255)";
+  if (slot === "horsepower") return "Koliko ima avto konjskih moči (KM)?";
   if (slot === "coverageLevel") return "Katero kritje želite: osnovno, delni kasko ali polni kasko?";
   return null;
 }
@@ -447,7 +438,6 @@ function formatCoverageLabel(lvl) {
   return lvl;
 }
 
-// -------- intent detection --------
 
 function looksLikeInfoQuestion(text) {
   const t = (text || "").toLowerCase().trim();
@@ -528,7 +518,6 @@ function isNewPremiumRequest(text) {
   return hasVehicle && (hasAgeHint || hasHpHint || hasCityHint);
 }
 
-// -------- RAG docs helpers (for frontend) --------
 
 function toDocMeta(d) {
   const text = String(d?.text || "");
@@ -548,7 +537,6 @@ app.get("/health", (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
-// ✅ NEW: list rag docs
 app.get("/rag/docs", (req, res) => {
   res.json({
     ok: true,
@@ -557,7 +545,6 @@ app.get("/rag/docs", (req, res) => {
   });
 });
 
-// ✅ NEW: get one rag doc full text
 app.get("/rag/docs/:id", (req, res) => {
   const id = String(req.params.id || "");
   const d = docs.find((x) => String(x.id) === id);
