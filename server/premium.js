@@ -18,7 +18,7 @@ export function calculate_premium(vehicleAge, horsepower, city, coverageLevel) {
   if (!Number.isFinite(hp) || hp <= 0) throw new Error("horsepower must be a positive number");
   if (!lvl) throw new Error("coverageLevel is required");
 
-  let base = 220;
+  const base = 220;
 
   const ageFactor = Math.max(0.78, Math.min(1.15, 1.10 - age * 0.02));
   const hpFactor = Math.max(0.85, Math.min(1.60, 0.85 + hp / 200));
